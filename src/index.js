@@ -11,7 +11,7 @@ app.use(express.json());
 const users = [];
 
 function checksExistsUserAccount(request, response, next) {
-  const {username} = request.query;
+  const {username} = request.headers;
 
   const user = users.find((users) => users.username === username);
 
@@ -27,7 +27,7 @@ app.post('/users', (request, response) => {
   const {name, username } = request.body;
   const id = uuidv4();
 
-  const usernameexists = users.find((users) => users.username === username);
+  const usernameexists = users.some((user) => user.username === username);
   if(usernameexists) {
     return response.status(400).json({error: "Usuario existente"})
   }
@@ -49,7 +49,7 @@ app.post('/users', (request, response) => {
 
 app.get('/todos',checksExistsUserAccount, (request, response) => {
   const {user} = request;
-  return response.status(201).json({todos : user.todos});  
+  return response.status(200).json(user.todos);  
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
